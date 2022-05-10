@@ -5,10 +5,12 @@ def safeExtGet(prop, fallback) {
 
 buildscript {
     repositories {
+        google()
         jcenter()
+        maven { url 'https://plugins.gradle.org/m2/' } // Gradle Plugin Portal
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:3.5.4'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -28,9 +30,9 @@ android {
 
 dependencies {
     implementation project(':openCVLibrary310')
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.facebook.react:react-native:+'
-    implementation 'com.google.zxing:core:3.0.1'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.facebook.react:react-native:'
+    implementation 'com.google.zxing:core:3.3.3'
     implementation 'org.piwik.sdk:piwik-sdk:0.0.4'
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
     implementation 'us.feras.mdv:markdownview:1.1.0'
