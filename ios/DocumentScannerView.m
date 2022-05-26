@@ -27,14 +27,17 @@
         self.onRectangleDetect(@{@"stableCounter": @(self.stableCounter), @"lastDetectionType": @(type)});
     }
 
-    if (self.stableCounter > self.detectionCountBeforeCapture){
+    if (self.stableCounter > self.detectionCountBeforeCapture &&
+        [NSDate timeIntervalSinceReferenceDate] > self.lastCaptureTime + self.durationBetweenCaptures) {
+        self.lastCaptureTime = [NSDate timeIntervalSinceReferenceDate];
+        self.stableCounter = 0;
         [self capture];
     }
 }
 
 - (void) capture {
     [self captureImageWithCompletionHander:^(UIImage *croppedImage, UIImage *initialImage, CIRectangleFeature *rectangleFeature) {
-      if (self.onPictureTaken) {
+      if (self.onPictureTaken2) {
             NSData *croppedImageData = UIImageJPEGRepresentation(croppedImage, self.quality);
 
             if (initialImage.imageOrientation != UIImageOrientationUp) {
@@ -51,14 +54,14 @@
              while rectangleFeature returns a rectangle viewed from landscape, which explains the nonsense of the mapping below.
              Sorry about that.
              */
-            NSDictionary *rectangleCoordinates = rectangleFeature ? @{
+            id rectangleCoordinates = rectangleFeature ? @{
                                      @"topLeft": @{ @"y": @(rectangleFeature.bottomLeft.x + 30), @"x": @(rectangleFeature.bottomLeft.y)},
                                      @"topRight": @{ @"y": @(rectangleFeature.topLeft.x + 30), @"x": @(rectangleFeature.topLeft.y)},
                                      @"bottomLeft": @{ @"y": @(rectangleFeature.bottomRight.x), @"x": @(rectangleFeature.bottomRight.y)},
                                      @"bottomRight": @{ @"y": @(rectangleFeature.topRight.x), @"x": @(rectangleFeature.topRight.y)},
                                      } : [NSNull null];
             if (self.useBase64) {
-              self.onPictureTaken(@{
+              self.onPictureTaken2(@{
                                     @"croppedImage": [croppedImageData base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength],
                                     @"initialImage": [initialImageData base64EncodedStringWithOptions:NSDataBase64Encoding64CharacterLineLength],
                                     @"rectangleCoordinates": rectangleCoordinates });
@@ -74,7 +77,7 @@
               [croppedImageData writeToFile:croppedFilePath atomically:YES];
               [initialImageData writeToFile:initialFilePath atomically:YES];
 
-               self.onPictureTaken(@{
+               self.onPictureTaken2(@{
                                      @"croppedImage": croppedFilePath,
                                      @"initialImage": initialFilePath,
                                      @"rectangleCoordinates": rectangleCoordinates });
